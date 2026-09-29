@@ -1,0 +1,2869 @@
+/* =========================================================
+
+   SMART FACTORY — FUTURISTIC SCADA UI
+
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+\#root {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+:root {
+    font-family: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #05080c;
+    color: #eafaff;
+}
+
+body {
+    min-width: 1100px;
+    overflow-x: auto;
+    background: #05080c;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+}
+
+
+/* =========================================================
+
+   MAIN BACKGROUND
+
+   ========================================================= */
+
+.app {
+    min-height: 100vh;
+    background: radial-gradient( circle at 12% 5%, rgba(0, 213, 255, 0.07), transparent 25%), radial-gradient( circle at 88% 25%, rgba(0, 150, 255, 0.055), transparent 28%), radial-gradient( circle at 50% 100%, rgba(0, 255, 200, 0.035), transparent 30%), #05080c;
+    transition: background 0.6s ease, box-shadow 0.6s ease;
+}
+
+.app.critical-dashboard {
+    background: radial-gradient( circle at 50% 0%, rgba(255, 0, 0, 0.18), transparent 30%), radial-gradient( circle at 10% 50%, rgba(255, 0, 0, 0.08), transparent 25%), #0d0507;
+    animation: criticalEnvironment 1.4s infinite alternate;
+}
+
+@keyframes criticalEnvironment {
+    from {
+        box-shadow: inset 0 0 80px rgba(255, 0, 0, 0.02);
+    }
+    to {
+        box-shadow: inset 0 0 100px rgba(255, 0, 0, 0.1);
+    }
+}
+
+
+/* =========================================================
+
+   TOP HEADER
+
+   ========================================================= */
+
+.topbar {
+    height: 88px;
+    padding: 0 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5, 9, 14, 0.82);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(66, 224, 255, 0.12);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.critical-dashboard .topbar {
+    border-bottom-color: rgba(255, 40, 40, 0.4);
+    box-shadow: 0 10px 45px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 0, 0, 0.08);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+}
+
+.factory-logo {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    color: #23e5f7;
+    border: 1px solid rgba(35, 229, 247, 0.65);
+    background: radial-gradient( circle at 50% 40%, rgba(35, 229, 247, 0.18), rgba(35, 229, 247, 0.02));
+    font-size: 15px;
+    font-weight: 900;
+    box-shadow: 0 0 25px rgba(35, 229, 247, 0.18), inset 0 0 18px rgba(35, 229, 247, 0.06);
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+.brand-title {
+    font-size: 21px;
+    font-weight: 850;
+    letter-spacing: 2.8px;
+}
+
+.brand-subtitle {
+    margin-top: 5px;
+    color: #627985;
+    font-family: "Consolas", monospace;
+    font-size: 10px;
+    letter-spacing: 1.6px;
+}
+
+.header-status {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #708690;
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+}
+
+.connection-status.online {
+    color: #55f19b;
+}
+
+.status-light {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 13px currentColor;
+    animation: statusPulse 1.7s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+    0%,
+    100% {
+        opacity: 0.55;
+        transform: scale(0.85);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+.settings-button {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: 1px solid rgba(110, 150, 165, 0.2);
+    background: rgba(255, 255, 255, 0.025);
+    color: #8ba4af;
+    transition: transform 0.25s ease, color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.settings-button:hover {
+    transform: rotate(25deg);
+    color: #24dff1;
+    border-color: rgba(36, 223, 241, 0.5);
+    background: rgba(36, 223, 241, 0.08);
+}
+
+
+/* =========================================================
+
+   CRITICAL ALERT
+
+   ========================================================= */
+
+.critical-banner {
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    position: sticky;
+    top: 88px;
+    z-index: 95;
+    color: #fff;
+    background: linear-gradient( 90deg, #5f0808, #bd1515, #5f0808);
+    border-bottom: 1px solid #ff5050;
+    box-shadow: 0 0 35px rgba(255, 0, 0, 0.35), inset 0 0 30px rgba(255, 255, 255, 0.03);
+    font-family: "Consolas", monospace;
+    font-size: 12px;
+    animation: alertFlash 0.85s infinite;
+}
+
+.critical-pulse {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 0 8px white, 0 0 25px white;
+    animation: alertDot 0.6s infinite alternate;
+}
+
+@keyframes alertFlash {
+    0%,
+    100% {
+        filter: brightness(0.9);
+    }
+    50% {
+        filter: brightness(1.35);
+    }
+}
+
+@keyframes alertDot {
+    from {
+        transform: scale(0.7);
+    }
+    to {
+        transform: scale(1.35);
+    }
+}
+
+
+/* =========================================================
+
+   CONTENT
+
+   ========================================================= */
+
+.dashboard {
+    width: min(1500px, calc(100% - 80px));
+    margin: auto;
+    padding: 48px 0 70px;
+}
+
+
+/* =========================================================
+
+   HERO
+
+   ========================================================= */
+
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+.eyebrow,
+.section-number {
+    color: #22dcec;
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+}
+
+.hero h1 {
+    margin: 10px 0 10px;
+    font-size: clamp(34px, 4vw, 48px);
+    line-height: 1.05;
+    letter-spacing: -1.7px;
+    background: linear-gradient( 90deg, #f1fbff, #a7eaf3 55%, #55dceb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.hero p {
+    margin: 0;
+    color: #708690;
+    font-size: 14px;
+}
+
+.system-indicator {
+    min-width: 220px;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    border-radius: 18px;
+    color: #61f2a1;
+    background: rgba(45, 220, 125, 0.045);
+    border: 1px solid rgba(74, 235, 148, 0.28);
+    box-shadow: 0 0 25px rgba(44, 224, 125, 0.05), inset 0 0 20px rgba(44, 224, 125, 0.03);
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+    font-weight: 800;
+    animation: systemFloat 3s ease-in-out infinite;
+}
+
+@keyframes systemFloat {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+.system-indicator.warning {
+    color: #ffc34f;
+    border-color: rgba(255, 190, 50, 0.4);
+    background: rgba(255, 174, 0, 0.06);
+}
+
+.system-indicator.critical {
+    color: #ff5b5b;
+    border-color: rgba(255, 50, 50, 0.65);
+    background: rgba(255, 30, 30, 0.09);
+    animation: criticalStatus 0.75s infinite;
+}
+
+@keyframes criticalStatus {
+    0%,
+    100% {
+        box-shadow: 0 0 15px rgba(255, 0, 0, 0.15), inset 0 0 15px rgba(255, 0, 0, 0.04);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(255, 0, 0, 0.4), inset 0 0 30px rgba(255, 0, 0, 0.1);
+    }
+}
+
+.indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 14px currentColor;
+    animation: statusPulse 1s infinite;
+}
+
+
+/* =========================================================
+
+   INFO STRIP
+
+   ========================================================= */
+
+.info-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    overflow: hidden;
+    margin-bottom: 48px;
+    border-radius: 20px;
+    border: 1px solid rgba(80, 140, 155, 0.16);
+    background: rgba(12, 20, 27, 0.62);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.info-strip>div {
+    padding: 18px 22px;
+    border-right: 1px solid rgba(80, 140, 155, 0.11);
+    transition: background 0.25s ease;
+}
+
+.info-strip>div:hover {
+    background: rgba(30, 210, 230, 0.035);
+}
+
+.info-strip>div:last-child {
+    border-right: none;
+}
+
+.info-strip span {
+    display: block;
+    margin-bottom: 7px;
+    color: #536b76;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+}
+
+.info-strip strong {
+    color: #c9e2e8;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+
+   SECTION HEADER
+
+   ========================================================= */
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.section-header h2 {
+    margin: 7px 0 0;
+    font-size: 22px;
+    letter-spacing: -0.4px;
+}
+
+.home-button {
+    padding: 13px 18px;
+    border-radius: 13px;
+    color: #5ee8f3;
+    border: 1px solid rgba(35, 219, 239, 0.3);
+    background: rgba(21, 198, 220, 0.055);
+    font-family: "Consolas", monospace;
+    font-size: 10px;
+    font-weight: 800;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.home-button:hover {
+    transform: translateY(-3px);
+    background: rgba(21, 198, 220, 0.12);
+    box-shadow: 0 8px 25px rgba(21, 198, 220, 0.12);
+}
+
+
+/* =========================================================
+
+   MOTOR CARDS
+
+   ========================================================= */
+
+.motor-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.motor-card {
+    position: relative;
+    min-height: 290px;
+    padding: 24px;
+    overflow: hidden;
+    border-radius: 24px;
+    border: 1px solid rgba(65, 155, 175, 0.18);
+    background: radial-gradient( circle at 90% 5%, rgba(24, 217, 236, 0.075), transparent 32%), linear-gradient( 145deg, rgba(17, 29, 38, 0.94), rgba(7, 13, 19, 0.96));
+    box-shadow: 0 20px 55px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.025);
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+    animation: cardFloat 5s ease-in-out infinite;
+}
+
+.motor-card:nth-child(2) {
+    animation-delay: -1s;
+}
+
+.motor-card:nth-child(3) {
+    animation-delay: -2s;
+}
+
+.motor-card:nth-child(4) {
+    animation-delay: -3s;
+}
+
+@keyframes cardFloat {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+.motor-card::before {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    right: -45px;
+    top: -45px;
+    border-radius: 50%;
+    background: rgba(24, 217, 236, 0.08);
+    filter: blur(20px);
+    transition: 0.4s ease;
+}
+
+.motor-card:hover {
+    transform: translateY(-9px) scale(1.012);
+    border-color: rgba(35, 224, 242, 0.48);
+    box-shadow: 0 25px 65px rgba(0, 0, 0, 0.38), 0 0 35px rgba(22, 213, 231, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.motor-card:hover::before {
+    transform: scale(1.7);
+    background: rgba(24, 217, 236, 0.12);
+}
+
+.locked-card {
+    border-color: rgba(255, 60, 60, 0.35);
+    background: radial-gradient( circle at 90% 5%, rgba(255, 30, 30, 0.11), transparent 32%), linear-gradient( 145deg, rgba(35, 13, 17, 0.94), rgba(12, 7, 10, 0.96));
+}
+
+.motor-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.motor-header>div>span {
+    color: #536b77;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    letter-spacing: 1.8px;
+}
+
+.motor-header h3 {
+    margin: 6px 0 0;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+.motor-status {
+    color: #5af19b;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    animation: statusPulse 1.8s infinite;
+}
+
+.motor-status.locked {
+    color: #ff5656;
+}
+
+.angle {
+    margin-top: 28px;
+    color: #effcff;
+    font-size: 54px;
+    line-height: 1;
+    font-weight: 750;
+    letter-spacing: -2px;
+    text-shadow: 0 0 25px rgba(92, 229, 245, 0.1);
+}
+
+.angle small {
+    color: #21dcec;
+    font-size: 21px;
+}
+
+.angle-label {
+    margin-top: 7px;
+    color: #4f6672;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+}
+
+.motor-card input[type="range"] {
+    width: 100%;
+    margin-top: 27px;
+    accent-color: #20d8e8;
+    cursor: pointer;
+}
+
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    color: #465b65;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+}
+
+.quick-buttons {
+    display: flex;
+    gap: 7px;
+    margin-top: 17px;
+}
+
+.quick-buttons button {
+    flex: 1;
+    padding: 9px 5px;
+    border-radius: 10px;
+    border: 1px solid rgba(90, 135, 148, 0.2);
+    background: rgba(255, 255, 255, 0.025);
+    color: #849aa5;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    transition: transform 0.2s ease, color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.quick-buttons button:hover {
+    transform: translateY(-2px);
+    color: #2be1f0;
+    border-color: rgba(43, 225, 240, 0.45);
+    background: rgba(43, 225, 240, 0.07);
+}
+
+
+/* =========================================================
+
+   SENSOR CARDS
+
+   ========================================================= */
+
+.sensor-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.sensor-card {
+    position: relative;
+    min-height: 270px;
+    padding: 27px;
+    overflow: hidden;
+    border-radius: 28px;
+    background: linear-gradient( 145deg, rgba(17, 28, 37, 0.96), rgba(7, 13, 18, 0.96));
+    border: 1px solid rgba(80, 140, 155, 0.16);
+    box-shadow: 0 25px 65px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.025);
+    transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.sensor-card:hover {
+    transform: translateY(-7px);
+    border-color: rgba(42, 217, 233, 0.35);
+}
+
+.sensor-card::after {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    right: -75px;
+    bottom: -85px;
+    border-radius: 50%;
+    background: rgba(24, 215, 233, 0.045);
+    filter: blur(15px);
+}
+
+.temperature-card {
+    border-color: rgba(255, 143, 48, 0.18);
+    animation: temperatureIdle 3s ease-in-out infinite;
+}
+
+@keyframes temperatureIdle {
+    0%,
+    100% {
+        box-shadow: 0 25px 65px rgba(0, 0, 0, 0.28), 0 0 15px rgba(255, 140, 40, 0.025);
+    }
+    50% {
+        box-shadow: 0 25px 65px rgba(0, 0, 0, 0.28), 0 0 30px rgba(255, 140, 40, 0.08);
+    }
+}
+
+.temperature-card.warning {
+    border-color: rgba(255, 181, 54, 0.55);
+}
+
+.temperature-card.critical {
+    border-color: rgba(255, 60, 60, 0.75);
+    animation: heatCritical 0.8s infinite;
+}
+
+@keyframes heatCritical {
+    0%,
+    100% {
+        box-shadow: 0 25px 65px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 0, 0, 0.1);
+    }
+    50% {
+        box-shadow: 0 25px 65px rgba(0, 0, 0, 0.3), 0 0 45px rgba(255, 0, 0, 0.3);
+    }
+}
+
+.sensor-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sensor-icon {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    font-family: "Consolas", monospace;
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.temperature-icon {
+    color: #ff9637;
+    border: 1px solid rgba(255, 150, 55, 0.35);
+    box-shadow: 0 0 25px rgba(255, 150, 55, 0.08);
+}
+
+.vibration-icon {
+    color: #22d9eb;
+    border: 1px solid rgba(34, 217, 235, 0.35);
+    font-size: 28px;
+    animation: vibrationPulse 1.4s infinite;
+}
+
+@keyframes vibrationPulse {
+    0%,
+    100% {
+        box-shadow: 0 0 10px rgba(34, 217, 235, 0.04);
+    }
+    50% {
+        box-shadow: 0 0 28px rgba(34, 217, 235, 0.18);
+    }
+}
+
+.sensor-status {
+    padding: 7px 11px;
+    border-radius: 999px;
+    color: #ffad46;
+    border: 1px solid rgba(255, 173, 70, 0.3);
+    background: rgba(255, 173, 70, 0.05);
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.sensor-status.normal {
+    color: #59ee98;
+    border-color: rgba(89, 238, 152, 0.28);
+    background: rgba(89, 238, 152, 0.04);
+}
+
+.sensor-heading {
+    display: block;
+    margin-top: 25px;
+    color: #718690;
+    font-family: "Consolas", monospace;
+    font-size: 10px;
+    letter-spacing: 1.4px;
+}
+
+.sensor-number {
+    margin-top: 5px;
+    font-size: 58px;
+    line-height: 1;
+    font-weight: 750;
+    letter-spacing: -2px;
+}
+
+.temperature-card .sensor-number {
+    color: #ff9d42;
+    text-shadow: 0 0 25px rgba(255, 157, 66, 0.1);
+}
+
+.vibration-card .sensor-number {
+    color: #28dced;
+    text-shadow: 0 0 25px rgba(40, 220, 237, 0.12);
+}
+
+.sensor-number small {
+    color: #718791;
+    font-size: 19px;
+    letter-spacing: 0;
+}
+
+.sensor-description {
+    margin-top: 7px;
+    color: #526a75;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+}
+
+.temperature-scale {
+    height: 6px;
+    margin-top: 24px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #142027;
+}
+
+.temperature-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient( 90deg, #ffbb45, #ff762e);
+    box-shadow: 0 0 15px rgba(255, 120, 40, 0.6);
+    transition: width 0.5s ease;
+}
+
+.sensor-limits {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 9px;
+    color: #536872;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+}
+
+.axis-values {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9px;
+    margin-top: 25px;
+}
+
+.axis-values div {
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(80, 140, 155, 0.13);
+    background: rgba(255, 255, 255, 0.018);
+    transition: 0.25s ease;
+}
+
+.axis-values div:hover {
+    transform: translateY(-3px);
+    border-color: rgba(34, 217, 235, 0.3);
+    background: rgba(34, 217, 235, 0.035);
+}
+
+.axis-values span {
+    display: block;
+    color: #526872;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+}
+
+.axis-values strong {
+    display: block;
+    margin-top: 5px;
+    color: #b5e7eb;
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+
+   GENERAL PANELS
+
+   ========================================================= */
+
+.control-grid,
+.lower-grid {
+    display: grid;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.control-grid {
+    grid-template-columns: 1.45fr 1fr;
+}
+
+.lower-grid {
+    grid-template-columns: 1fr 1fr;
+}
+
+.panel {
+    position: relative;
+    padding: 26px;
+    overflow: hidden;
+    border-radius: 26px;
+    border: 1px solid rgba(70, 140, 155, 0.14);
+    background: linear-gradient( 145deg, rgba(14, 25, 33, 0.94), rgba(7, 13, 18, 0.96));
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.panel:hover {
+    border-color: rgba(42, 205, 223, 0.22);
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 27px;
+}
+
+.panel-number {
+    color: #1ed9e9;
+    font-family: "Consolas", monospace;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.panel-header>div>span {
+    display: block;
+    margin-top: 4px;
+    color: #526773;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+}
+
+
+/* =========================================================
+
+   JOYSTICKS
+
+   ========================================================= */
+
+.joystick-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 45px;
+}
+
+.joystick {
+    text-align: center;
+}
+
+.joystick-name {
+    margin-bottom: 17px;
+    color: #718790;
+    font-family: "Consolas", monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+}
+
+.joystick-circle {
+    width: 175px;
+    height: 175px;
+    margin: auto;
+    position: relative;
+    border-radius: 50%;
+    background: radial-gradient( circle, rgba(27, 218, 235, 0.11) 0 18%, rgba(12, 28, 35, 0.9) 19% 45%, rgba(5, 13, 18, 0.95) 46% 100%);
+    border: 1px solid rgba(34, 218, 235, 0.3);
+    box-shadow: 0 0 30px rgba(34, 218, 235, 0.07), inset 0 0 35px rgba(34, 218, 235, 0.08);
+    animation: joystickGlow 3s infinite;
+}
+
+@keyframes joystickGlow {
+    0%,
+    100% {
+        box-shadow: 0 0 25px rgba(34, 218, 235, 0.05), inset 0 0 30px rgba(34, 218, 235, 0.05);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(34, 218, 235, 0.12), inset 0 0 40px rgba(34, 218, 235, 0.09);
+    }
+}
+
+.joystick-cross {
+    position: absolute;
+    background: rgba(50, 113, 126, 0.35);
+}
+
+.joystick-cross.horizontal {
+    left: 15px;
+    right: 15px;
+    top: 50%;
+    height: 1px;
+}
+
+.joystick-cross.vertical {
+    top: 15px;
+    bottom: 15px;
+    left: 50%;
+    width: 1px;
+}
+
+.joystick-knob {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    left: calc(50% - 18px);
+    top: calc(50% - 18px);
+    border-radius: 50%;
+    background: radial-gradient( circle at 35% 30%, #8cffff, #1cd9ec 45%, #087986);
+    border: 4px solid #07161b;
+    box-shadow: 0 0 20px rgba(28, 217, 236, 0.85), 0 0 45px rgba(28, 217, 236, 0.22);
+    transition: transform 0.3s ease;
+}
+
+.joystick-data {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    margin-top: 19px;
+}
+
+.joystick-data div {
+    padding: 10px;
+    border-radius: 13px;
+    border: 1px solid rgba(70, 140, 155, 0.12);
+    background: rgba(255, 255, 255, 0.018);
+}
+
+.joystick-data span {
+    display: block;
+    color: #536a75;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+}
+
+.joystick-data strong {
+    display: block;
+    margin-top: 4px;
+    color: #c0e9ed;
+    font-family: "Consolas", monospace;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+
+   GRIPPER
+
+   ========================================================= */
+
+.gripper-display {
+    min-height: 205px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.gripper-symbol {
+    color: #21dcec;
+    font-family: "Consolas", monospace;
+    font-size: 58px;
+    letter-spacing: -9px;
+    text-shadow: 0 0 20px rgba(33, 220, 236, 0.4);
+    animation: gripperFloat 2.7s ease-in-out infinite;
+}
+
+@keyframes gripperFloat {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-7px);
+    }
+}
+
+.gripper-display span {
+    margin-top: 22px;
+    color: #506772;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+}
+
+.gripper-display strong {
+    margin-top: 6px;
+    color: #e2f7fa;
+    font-size: 17px;
+}
+
+.gripper-buttons {
+    display: flex;
+    gap: 9px;
+}
+
+.gripper-buttons button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(75, 145, 158, 0.2);
+    background: rgba(255, 255, 255, 0.025);
+    color: #92a9b3;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    transition: 0.25s ease;
+}
+
+.gripper-buttons button:hover {
+    color: #2ce0ee;
+    border-color: rgba(44, 224, 238, 0.45);
+    background: rgba(44, 224, 238, 0.06);
+    transform: translateY(-3px);
+}
+
+
+/* =========================================================
+
+   GRAPHS
+
+   ========================================================= */
+
+.graph-panel {
+    margin-top: 18px;
+}
+
+.graphs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.chart {
+    padding: 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(65, 140, 155, 0.13);
+    background: rgba(4, 10, 14, 0.7);
+    overflow: hidden;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 13px;
+}
+
+.chart-header span {
+    color: #657b86;
+    font-family: "Consolas", monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+.chart-header strong {
+    color: #ff9d42;
+    font-family: "Consolas", monospace;
+    font-size: 13px;
+}
+
+.chart:nth-child(2) .chart-header strong {
+    color: #2cdeed;
+}
+
+.chart svg {
+    width: 100%;
+    height: 190px;
+    display: block;
+}
+
+.graph-grid {
+    stroke: rgba(70, 130, 145, 0.08);
+    stroke-width: 1;
+}
+
+.temperature-line,
+.vibration-line {
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.temperature-line {
+    stroke: #ff8d35;
+    filter: drop-shadow(0 0 6px rgba(255, 141, 53, 0.6));
+}
+
+.vibration-line {
+    stroke: #25ddec;
+    filter: drop-shadow(0 0 6px rgba(37, 221, 236, 0.6));
+}
+
+
+/* =========================================================
+
+   SAFETY
+
+   ========================================================= */
+
+.safety-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(72, 235, 143, 0.22);
+    background: rgba(55, 220, 130, 0.035);
+    transition: 0.3s ease;
+}
+
+.safety-box.warning {
+    border-color: rgba(255, 190, 60, 0.4);
+    background: rgba(255, 180, 30, 0.045);
+}
+
+.safety-box.critical {
+    border-color: rgba(255, 60, 60, 0.6);
+    background: rgba(255, 20, 20, 0.065);
+    animation: safetyCritical 0.9s infinite;
+}
+
+@keyframes safetyCritical {
+    50% {
+        box-shadow: 0 0 30px rgba(255, 0, 0, 0.18), inset 0 0 20px rgba(255, 0, 0, 0.04);
+    }
+}
+
+.safety-symbol {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #58ef99;
+    border: 1px solid currentColor;
+    font-weight: 900;
+    box-shadow: 0 0 20px rgba(88, 239, 153, 0.1);
+}
+
+.safety-box.warning .safety-symbol {
+    color: #ffc44e;
+}
+
+.safety-box.critical .safety-symbol {
+    color: #ff5555;
+    animation: statusPulse 0.7s infinite;
+}
+
+.safety-box strong {
+    display: block;
+    font-family: "Consolas", monospace;
+    font-size: 13px;
+}
+
+.safety-box span {
+    display: block;
+    margin-top: 6px;
+    color: #687d87;
+    font-size: 10px;
+}
+
+.recovery-button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 14px;
+    border-radius: 14px;
+    color: #ff7777;
+    border: 1px solid rgba(255, 70, 70, 0.55);
+    background: linear-gradient( 90deg, rgba(100, 10, 10, 0.7), rgba(155, 20, 20, 0.7), rgba(100, 10, 10, 0.7));
+    font-family: "Consolas", monospace;
+    font-size: 10px;
+    font-weight: 800;
+    animation: recoveryGlow 1.2s infinite;
+}
+
+@keyframes recoveryGlow {
+    50% {
+        box-shadow: 0 0 30px rgba(255, 0, 0, 0.18);
+    }
+}
+
+.recovery-progress {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-top: 15px;
+    padding: 13px 15px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 70, 70, 0.3);
+    background: rgba(255, 30, 30, 0.045);
+    color: #ff7777;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+}
+
+.recovery-spinner {
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 80, 80, 0.18);
+    border-top-color: #ff5959;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+
+   DIAGNOSTICS
+
+   ========================================================= */
+
+.diagnostic-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(70, 130, 145, 0.09);
+}
+
+.diagnostic-row:last-child {
+    border-bottom: none;
+}
+
+.diagnostic-row>span {
+    color: #718690;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+}
+
+.diagnostic-row strong {
+    color: #57ed97;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+}
+
+.diagnostic-row i {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: #57ed97;
+    box-shadow: 0 0 10px #57ed97;
+    animation: statusPulse 1.5s infinite;
+}
+
+
+/* =========================================================
+
+   EVENT LOG
+
+   ========================================================= */
+
+.event-panel {
+    margin-top: 18px;
+}
+
+.event-list {
+    max-height: 290px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.event-row {
+    display: grid;
+    grid-template-columns: 100px 100px 1fr;
+    align-items: center;
+    gap: 18px;
+    padding: 13px 4px;
+    border-bottom: 1px solid rgba(70, 130, 145, 0.08);
+    transition: background 0.2s ease;
+}
+
+.event-row:hover {
+    background: rgba(30, 210, 230, 0.025);
+}
+
+.event-row>span {
+    color: #526872;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+}
+
+.event-type {
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    color: #24dcea;
+}
+
+.event-type.critical,
+.event-type.e-stop {
+    color: #ff5959;
+}
+
+.event-type.safety {
+    color: #ffb23f;
+}
+
+.event-row p {
+    margin: 0;
+    color: #8ba0aa;
+    font-size: 10px;
+}
+
+
+/* =========================================================
+
+   DEVELOPMENT TEST
+
+   ========================================================= */
+
+.testing-panel {
+    margin-top: 18px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    border-radius: 18px;
+    border: 1px dashed rgba(90, 130, 145, 0.25);
+    background: rgba(255, 255, 255, 0.012);
+}
+
+.testing-panel span {
+    color: #617681;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    letter-spacing: 1.2px;
+}
+
+.testing-panel p {
+    margin: 5px 0 0;
+    color: #4e626d;
+    font-size: 9px;
+}
+
+.testing-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.testing-buttons button {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 80, 80, 0.25);
+    background: rgba(255, 40, 40, 0.035);
+    color: #d77676;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+    transition: 0.25s ease;
+}
+
+.testing-buttons button:hover {
+    transform: translateY(-2px);
+    color: #ff7171;
+    border-color: rgba(255, 70, 70, 0.55);
+    background: rgba(255, 50, 50, 0.08);
+}
+
+
+/* =========================================================
+
+   EMERGENCY STOP
+
+   ========================================================= */
+
+.emergency-panel {
+    position: relative;
+    margin-top: 22px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    border-radius: 28px;
+    border: 1px solid rgba(255, 75, 75, 0.32);
+    background: radial-gradient( circle at 15% 50%, rgba(255, 50, 50, 0.1), transparent 30%), linear-gradient( 120deg, rgba(55, 12, 15, 0.86), rgba(15, 7, 10, 0.92));
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), inset 0 0 40px rgba(255, 0, 0, 0.025);
+    overflow: hidden;
+}
+
+.emergency-panel::after {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    right: -160px;
+    top: -170px;
+    border-radius: 50%;
+    background: rgba(255, 40, 40, 0.055);
+    filter: blur(20px);
+    pointer-events: none;
+}
+
+.emergency-panel.emergency-active {
+    border-color: #ff4040;
+    background: radial-gradient( circle at 15% 50%, rgba(255, 40, 40, 0.2), transparent 35%), linear-gradient( 120deg, rgba(110, 12, 15, 0.95), rgba(25, 5, 8, 0.98));
+    animation: emergencyActive 0.8s infinite;
+}
+
+@keyframes emergencyActive {
+    50% {
+        box-shadow: 0 20px 70px rgba(0, 0, 0, 0.4), 0 0 45px rgba(255, 0, 0, 0.2), inset 0 0 50px rgba(255, 0, 0, 0.08);
+    }
+}
+
+.emergency-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.emergency-symbol {
+    width: 65px;
+    height: 65px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 20px;
+    color: white;
+    background: radial-gradient( circle, #d82020, #851010);
+    border: 2px solid #ff5050;
+    font-size: 29px;
+    font-weight: 900;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+    animation: emergencyIcon 1s infinite alternate;
+}
+
+@keyframes emergencyIcon {
+    from {
+        transform: scale(0.96);
+    }
+    to {
+        transform: scale(1.04);
+    }
+}
+
+.emergency-info>div>span {
+    color: #ff6666;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    letter-spacing: 1.8px;
+}
+
+.emergency-info h2 {
+    margin: 7px 0;
+    font-size: 21px;
+    letter-spacing: 0.3px;
+}
+
+.emergency-info p {
+    margin: 0;
+    color: #9a7477;
+    font-size: 10px;
+}
+
+.estop-button,
+.reset-button {
+    position: relative;
+    z-index: 3;
+    min-width: 230px;
+    height: 60px;
+    border-radius: 16px;
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.estop-button {
+    color: white;
+    border: 2px solid #ff5555;
+    background: linear-gradient( 135deg, #a81717, #6d0b0b);
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.18);
+}
+
+.estop-button:hover {
+    transform: scale(1.035);
+    box-shadow: 0 0 40px rgba(255, 0, 0, 0.4);
+}
+
+.reset-button {
+    color: #72f3a5;
+    border: 2px solid #45df82;
+    background: linear-gradient( 135deg, #174c30, #0b2819);
+    box-shadow: 0 0 25px rgba(50, 220, 120, 0.12);
+}
+
+.reset-button:hover {
+    transform: scale(1.035);
+    box-shadow: 0 0 35px rgba(50, 220, 120, 0.25);
+}
+
+
+/* =========================================================
+
+   FOOTER
+
+   ========================================================= */
+
+.footer {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 35px;
+    border-top: 1px solid rgba(70, 130, 145, 0.1);
+    color: #526671;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    letter-spacing: 0.8px;
+    background: rgba(4, 7, 10, 0.65);
+}
+
+
+/* =========================================================
+
+   SCROLLBAR
+
+   ========================================================= */
+
+::-webkit-scrollbar {
+    width: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: #06090d;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1b3943;
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #255765;
+}
+
+
+/* =========================================================
+
+   RESPONSIVE
+
+   ========================================================= */
+
+@media (max-width: 1250px) {
+    .dashboard {
+        width: calc(100% - 50px);
+    }
+    .motor-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .hero h1 {
+        font-size: 38px;
+    }
+}
+
+
+/* =========================================================
+
+   READABILITY BOOST — LOWER DASHBOARD
+
+   ========================================================= */
+
+.panel-header h3 {
+    font-size: 16px;
+}
+
+.panel-header>div>span {
+    font-size: 10px;
+}
+
+.diagnostic-row>span {
+    font-size: 11px;
+}
+
+.diagnostic-row strong {
+    font-size: 10px;
+}
+
+.event-row {
+    padding: 15px 6px;
+    grid-template-columns: 115px 110px 1fr;
+}
+
+.event-row>span {
+    font-size: 10px;
+}
+
+.event-type {
+    font-size: 10px;
+}
+
+.event-row p {
+    font-size: 12px;
+}
+
+.testing-panel span {
+    font-size: 10px;
+}
+
+.testing-panel p {
+    font-size: 11px;
+}
+
+.testing-buttons button {
+    font-size: 10px;
+    padding: 11px 16px;
+}
+
+.emergency-info>div>span {
+    font-size: 10px;
+}
+
+.emergency-info h2 {
+    font-size: 23px;
+}
+
+.emergency-info p {
+    font-size: 12px;
+}
+
+.estop-button,
+.reset-button {
+    font-size: 12px;
+}
+
+.footer {
+    font-size: 10px;
+    min-height: 55px;
+}
+
+
+/* Sensor supporting information */
+
+.sensor-description {
+    font-size: 10px;
+}
+
+.sensor-limits {
+    font-size: 9px;
+}
+
+.axis-values span {
+    font-size: 9px;
+}
+
+.axis-values strong {
+    font-size: 13px;
+}
+
+
+/* Joystick information */
+
+.joystick-name {
+    font-size: 11px;
+}
+
+.joystick-data span {
+    font-size: 9px;
+}
+
+.joystick-data strong {
+    font-size: 13px;
+}
+
+
+/* Motor supporting information */
+
+.motor-header>div>span {
+    font-size: 10px;
+}
+
+.motor-status {
+    font-size: 10px;
+}
+
+.angle-label {
+    font-size: 9px;
+}
+
+.range-labels {
+    font-size: 9px;
+}
+
+.quick-buttons button {
+    font-size: 10px;
+}
+
+
+/* Graph labels */
+
+.chart-header span {
+    font-size: 10px;
+}
+
+.chart-header strong {
+    font-size: 14px;
+}
+
+
+/* =========================================================
+
+   ESP32 CONNECT / DISCONNECT BUTTON
+
+   Smooth SCADA interaction
+
+   ========================================================= */
+
+.header-status .settings-button {
+    position: relative;
+    overflow: hidden;
+    min-width: 150px;
+    width: auto;
+    height: 42px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 12px;
+    color: #8ba4af;
+    border: 1px solid rgba(110, 150, 165, 0.22);
+    background: rgba(255, 255, 255, 0.025);
+    cursor: pointer;
+    transform: none;
+    transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+}
+
+
+/* Remove the old rotating gear behavior */
+
+.header-status .settings-button:hover {
+    transform: translateY(-1px);
+    color: #5ee8f3;
+    border-color: rgba(36, 223, 241, 0.55);
+    background: linear-gradient( 135deg, rgba(36, 223, 241, 0.10), rgba(36, 223, 241, 0.035));
+    box-shadow: 0 6px 22px rgba(21, 198, 220, 0.10), inset 0 0 18px rgba(36, 223, 241, 0.035);
+}
+
+
+/* Clean press */
+
+.header-status .settings-button:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 2px 10px rgba(21, 198, 220, 0.08), inset 0 0 12px rgba(36, 223, 241, 0.08);
+}
+
+
+/* Remove browser focus outline / replace with subtle SCADA ring */
+
+.header-status .settings-button:focus {
+    outline: none;
+}
+
+.header-status .settings-button:focus-visible {
+    box-shadow: 0 0 0 2px rgba(5, 8, 12, 0.9), 0 0 0 3px rgba(36, 223, 241, 0.45), 0 6px 22px rgba(21, 198, 220, 0.10);
+}
+
+
+/* Disabled state */
+
+.header-status .settings-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+    transform: none;
+    box-shadow: none;
+}
+
+.control-mode-panel {
+    margin-bottom: 28px;
+    padding: 20px;
+    border: 1px solid rgba(70, 190, 210, .18);
+    border-radius: 20px;
+    background: linear-gradient(145deg, rgba(13, 25, 33, .86), rgba(6, 12, 17, .92));
+    box-shadow: 0 18px 45px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .025)
+}
+
+.control-mode-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 15px
+}
+
+.control-mode-heading h3 {
+    margin: 6px 0 0;
+    font-size: 16px
+}
+
+.mode-state {
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(85, 241, 155, .28);
+    color: #55f19b;
+    background: rgba(85, 241, 155, .045);
+    font: 800 9px "Consolas", monospace;
+    letter-spacing: 1px
+}
+
+.mode-state.joystick {
+    color: #62b8ff;
+    border-color: rgba(98, 184, 255, .3);
+    background: rgba(98, 184, 255, .045)
+}
+
+.control-mode-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px
+}
+
+.control-mode-button {
+    min-height: 66px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    text-align: left;
+    padding: 12px 15px;
+    border-radius: 14px;
+    border: 1px solid rgba(100, 145, 158, .18);
+    background: rgba(255, 255, 255, .018);
+    color: #91a8b2;
+    transition: transform .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease
+}
+
+.control-mode-button>span {
+    width: 35px;
+    height: 35px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    font-size: 16px;
+    color: #607a85;
+    background: rgba(255, 255, 255, .025)
+}
+
+.control-mode-button strong,
+.control-mode-button small {
+    display: block
+}
+
+.control-mode-button strong {
+    font: 800 10px "Consolas", monospace;
+    letter-spacing: 1px
+}
+
+.control-mode-button small {
+    margin-top: 5px;
+    color: #526974;
+    font-size: 9px
+}
+
+.control-mode-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: rgba(36, 223, 241, .35);
+    background: rgba(36, 223, 241, .045);
+}
+
+.control-mode-button.active {
+    color: #5ee8f3;
+    border-color: rgba(36, 223, 241, .52);
+    background: linear-gradient(135deg, rgba(36, 223, 241, .10), rgba(36, 223, 241, .025));
+    box-shadow: 0 0 28px rgba(36, 223, 241, .07), inset 0 0 18px rgba(36, 223, 241, .025);
+}
+
+.control-mode-button.joystick-mode.active {
+    color: #72bdff;
+    border-color: rgba(98, 184, 255, .5);
+    background: linear-gradient(135deg, rgba(98, 184, 255, .09), rgba(98, 184, 255, .02));
+}
+
+.control-mode-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-top: 13px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(90, 140, 153, .10);
+    color: #526a75;
+    font: 9px "Consolas", monospace;
+    letter-spacing: .8px;
+}
+
+.control-mode-meta b {
+    color: #a9cbd3;
+}
+
+@media (max-width:900px) {
+    .control-mode-buttons {
+        grid-template-columns: 1fr
+    }
+}
+
+
+/* =========================================================
+   CONTROL AUTHORITY — DASHBOARD / JOYSTICK
+   ========================================================= */
+
+.robot-control-actions {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.control-authority {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.control-authority-label {
+    color: #526f7b;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.control-mode-switch {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid rgba(53, 169, 184, 0.24);
+    border-radius: 13px;
+    overflow: hidden;
+    background: rgba(7, 16, 22, 0.8);
+    box-shadow: inset 0 0 18px rgba(20, 220, 235, 0.025);
+}
+
+.control-mode-switch button {
+    min-height: 42px;
+    padding: 0 13px;
+    border: 0;
+    border-right: 1px solid rgba(53, 169, 184, 0.16);
+    background: transparent;
+    color: #617b86;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.7px;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.control-mode-switch button:last-child {
+    border-right: 0;
+}
+
+.control-mode-switch button:hover:not(:disabled) {
+    color: #a9eaf0;
+    background: rgba(36, 223, 241, 0.06);
+}
+
+.control-mode-switch button.active {
+    color: #5ee8f3;
+    background: linear-gradient(135deg, rgba(36, 223, 241, 0.14), rgba(36, 223, 241, 0.035));
+    box-shadow: inset 0 0 18px rgba(36, 223, 241, 0.05), 0 0 16px rgba(36, 223, 241, 0.05);
+}
+
+.control-mode-switch button.joystick-active {
+    color: #65f3b1;
+    background: linear-gradient(135deg, rgba(85, 241, 155, 0.12), rgba(85, 241, 155, 0.03));
+    box-shadow: inset 0 0 18px rgba(85, 241, 155, 0.04), 0 0 16px rgba(85, 241, 155, 0.04);
+}
+
+.control-mode-switch button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.control-mode-status {
+    min-height: 34px;
+    margin: -8px 0 18px;
+    padding: 0 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(65, 155, 175, 0.14);
+    border-radius: 10px;
+    background: rgba(8, 17, 23, 0.55);
+    color: #607b86;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+}
+
+.control-mode-status strong {
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+.control-mode-status.dashboard-mode strong {
+    color: #5ee8f3;
+}
+
+.control-mode-status.joystick-mode strong {
+    color: #65f3b1;
+}
+
+.control-mode-dot {
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+    background: #5ee8f3;
+    box-shadow: 0 0 10px currentColor;
+}
+
+.joystick-mode .control-mode-dot {
+    background: #65f3b1;
+}
+
+@media (max-width: 900px) {
+    .section-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+    }
+    .robot-control-actions {
+        width: 100%;
+        align-items: stretch;
+        justify-content: flex-start;
+    }
+    .control-authority {
+        align-items: flex-start;
+    }
+}
+
+
+/* =========================================================
+   INTERACTIVE VIRTUAL JOYSTICK
+   ========================================================= */
+
+.joystick-interactive .joystick-circle {
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    border-color: rgba(36, 223, 241, 0.38);
+    box-shadow: 0 0 28px rgba(36, 223, 241, 0.08), inset 0 0 24px rgba(36, 223, 241, 0.035);
+}
+
+.joystick-interactive .joystick-circle:hover {
+    border-color: rgba(36, 223, 241, 0.7);
+    box-shadow: 0 0 34px rgba(36, 223, 241, 0.13), inset 0 0 28px rgba(36, 223, 241, 0.055);
+}
+
+.joystick-interactive .joystick-circle:active {
+    cursor: grabbing;
+}
+
+.joystick-interactive .joystick-knob {
+    box-shadow: 0 0 0 6px rgba(36, 223, 241, 0.08), 0 0 24px rgba(36, 223, 241, 0.5);
+}
+
+.joystick-live-label {
+    position: absolute;
+    left: 50%;
+    bottom: 19px;
+    transform: translateX(-50%);
+    color: rgba(94, 232, 243, 0.55);
+    font-family: "Consolas", monospace;
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    pointer-events: none;
+}
+
+.joystick-control-hint {
+    margin-top: 10px;
+    color: #4e6873;
+    font-family: "Consolas", monospace;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-align: center;
+}
+
+.joystick-interactive .joystick-control-hint {
+    color: #5ee8f3;
+}
+
+
+/* =========================================================
+   08 · PREDICTIVE MAINTENANCE
+   ========================================================= */
+
+.maintenance-section {
+    margin-top: 58px;
+    margin-bottom: 55px;
+}
+
+.maintenance-header {
+    margin-bottom: 20px;
+}
+
+.maintenance-status {
+    min-width: 175px;
+    min-height: 42px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border-radius: 12px;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.1px;
+}
+
+.maintenance-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 12px currentColor;
+}
+
+.maintenance-status.normal {
+    color: #61f2a1;
+    background: rgba(45, 220, 125, 0.06);
+    border: 1px solid rgba(74, 235, 148, 0.25);
+}
+
+.maintenance-status.watch {
+    color: #5ee8f3;
+    background: rgba(36, 223, 241, 0.06);
+    border: 1px solid rgba(36, 223, 241, 0.25);
+}
+
+.maintenance-status.warning {
+    color: #ffc34f;
+    background: rgba(255, 190, 50, 0.06);
+    border: 1px solid rgba(255, 190, 50, 0.3);
+}
+
+.maintenance-status.critical {
+    color: #ff5b5b;
+    background: rgba(255, 40, 40, 0.08);
+    border: 1px solid rgba(255, 50, 50, 0.45);
+    animation: maintenanceCriticalPulse 1s infinite;
+}
+
+@keyframes maintenanceCriticalPulse {
+    0%,
+    100% {
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.05);
+    }
+    50% {
+        box-shadow: 0 0 28px rgba(255, 0, 0, 0.18);
+    }
+}
+
+.maintenance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.maintenance-card {
+    min-height: 245px;
+    padding: 23px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 21px;
+    border: 1px solid rgba(65, 155, 175, 0.17);
+    background: radial-gradient( circle at 90% 5%, rgba(24, 217, 236, 0.065), transparent 32%), linear-gradient( 145deg, rgba(17, 29, 38, 0.94), rgba(7, 13, 19, 0.96));
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.23), inset 0 1px 0 rgba(255, 255, 255, 0.025);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.maintenance-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(35, 224, 242, 0.38);
+    box-shadow: 0 24px 55px rgba(0, 0, 0, 0.35), 0 0 28px rgba(22, 213, 231, 0.055);
+}
+
+.maintenance-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.maintenance-label {
+    display: block;
+    margin-bottom: 7px;
+    color: #536b76;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+    letter-spacing: 1.4px;
+}
+
+.maintenance-card h3 {
+    margin: 0;
+    color: #cde5eb;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+}
+
+.health-indicator {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    font-size: 15px;
+}
+
+.health-indicator.normal {
+    color: #61f2a1;
+    background: rgba(45, 220, 125, 0.07);
+}
+
+.health-indicator.watch {
+    color: #5ee8f3;
+    background: rgba(36, 223, 241, 0.07);
+}
+
+.health-indicator.warning {
+    color: #ffc34f;
+    background: rgba(255, 190, 50, 0.07);
+}
+
+.health-indicator.critical {
+    color: #ff5b5b;
+    background: rgba(255, 40, 40, 0.09);
+}
+
+.health-score {
+    margin-top: 24px;
+}
+
+.health-score-value {
+    color: #68efaa;
+    font-family: "Consolas", monospace;
+    font-size: 52px;
+    line-height: 1;
+    font-weight: 800;
+    text-shadow: 0 0 25px rgba(80, 245, 165, 0.16);
+}
+
+.health-score span {
+    display: block;
+    margin-top: 8px;
+    color: #536b76;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+}
+
+.health-message {
+    margin-top: 22px;
+    color: #7f969f;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.maintenance-metric {
+    margin-top: 24px;
+    color: #ffb74d;
+    font-family: "Consolas", monospace;
+    font-size: 40px;
+    font-weight: 800;
+}
+
+.maintenance-metric small {
+    color: #6f858e;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.maintenance-icon {
+    min-width: 35px;
+    height: 35px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.temperature-icon {
+    color: #ffb74d;
+    background: rgba(255, 170, 50, 0.08);
+    border: 1px solid rgba(255, 170, 50, 0.18);
+}
+
+.vibration-icon {
+    color: #5ee8f3;
+    background: rgba(36, 223, 241, 0.08);
+    border: 1px solid rgba(36, 223, 241, 0.18);
+}
+
+.maintenance-range {
+    height: 5px;
+    margin-top: 20px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.maintenance-range-fill {
+    height: 100%;
+    border-radius: inherit;
+    transition: width 0.5s ease;
+}
+
+.temperature-fill {
+    background: linear-gradient( 90deg, #61f2a1, #ffc34f, #ff5b5b);
+    box-shadow: 0 0 12px rgba(255, 170, 50, 0.18);
+}
+
+.vibration-fill {
+    background: linear-gradient( 90deg, #61f2a1, #5ee8f3, #ff5b5b);
+    box-shadow: 0 0 12px rgba(36, 223, 241, 0.18);
+}
+
+.maintenance-range-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    color: #455c66;
+    font-family: "Consolas", monospace;
+    font-size: 7px;
+}
+
+.maintenance-condition {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 22px;
+    color: #506771;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+    letter-spacing: 0.8px;
+}
+
+.maintenance-condition strong {
+    color: #61f2a1;
+}
+
+.service-details {
+    display: grid;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.service-details>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(90, 130, 145, 0.08);
+}
+
+.service-details span {
+    color: #536b76;
+    font-family: "Consolas", monospace;
+    font-size: 7px;
+    letter-spacing: 0.8px;
+}
+
+.service-details strong {
+    color: #bdd8df;
+    font-family: "Consolas", monospace;
+    font-size: 9px;
+}
+
+.service-normal {
+    color: #61f2a1 !important;
+}
+
+.service-warning {
+    color: #ffc34f !important;
+}
+
+.service-critical {
+    color: #ff5b5b !important;
+}
+
+.service-icon {
+    color: #8fa6af;
+    font-size: 22px;
+}
+
+.maintenance-recommendation {
+    min-height: 78px;
+    margin-top: 18px;
+    padding: 15px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(70, 150, 165, 0.16);
+    background: rgba(12, 20, 27, 0.7);
+}
+
+.maintenance-recommendation.normal {
+    border-color: rgba(74, 235, 148, 0.18);
+}
+
+.maintenance-recommendation.watch {
+    border-color: rgba(36, 223, 241, 0.22);
+}
+
+.maintenance-recommendation.warning {
+    border-color: rgba(255, 190, 50, 0.28);
+}
+
+.maintenance-recommendation.critical {
+    border-color: rgba(255, 50, 50, 0.4);
+    background: rgba(80, 10, 10, 0.25);
+}
+
+.recommendation-icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    color: #61f2a1;
+    background: rgba(45, 220, 125, 0.07);
+    font-family: "Consolas", monospace;
+    font-weight: 900;
+}
+
+.maintenance-recommendation.warning .recommendation-icon,
+.maintenance-recommendation.critical .recommendation-icon {
+    color: #ffc34f;
+    background: rgba(255, 190, 50, 0.08);
+}
+
+.recommendation-content {
+    flex: 1;
+}
+
+.recommendation-content span {
+    display: block;
+    margin-bottom: 5px;
+    color: #536b76;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+    letter-spacing: 1.3px;
+}
+
+.recommendation-content strong {
+    color: #bdd8df;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.maintenance-ack-button {
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 9px;
+    border: 1px solid rgba(36, 223, 241, 0.22);
+    background: rgba(36, 223, 241, 0.045);
+    color: #5ee8f3;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+}
+
+.maintenance-ack-button:hover {
+    background: rgba(36, 223, 241, 0.10);
+    border-color: rgba(36, 223, 241, 0.45);
+}
+
+.maintenance-checklist {
+    margin-top: 18px;
+    padding: 20px;
+    border-radius: 17px;
+    border: 1px solid rgba(70, 140, 155, 0.13);
+    background: rgba(8, 15, 21, 0.55);
+}
+
+.checklist-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.checklist-subtitle {
+    color: #425963;
+    font-family: "Consolas", monospace;
+    font-size: 7px;
+    letter-spacing: 1px;
+}
+
+.checklist-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.check-item {
+    min-height: 65px;
+    padding: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    border-radius: 11px;
+    border: 1px solid rgba(70, 140, 155, 0.09);
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.check-status {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 6px;
+    color: #61f2a1;
+    background: rgba(45, 220, 125, 0.07);
+    font-size: 10px;
+}
+
+.check-item strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #9ebac2;
+    font-family: "Consolas", monospace;
+    font-size: 8px;
+}
+
+.check-item span:last-child {
+    display: block;
+    color: #526b76;
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   SMART FACTORY — GLOBAL READABILITY BOOST
+   ========================================================= */
+
+:root {
+    --sf-scale: 1.18;
+}
+
+
+/* Main section headings */
+
+.section-header h2 {
+    font-size: 26px !important;
+}
+
+.hero h1 {
+    font-size: 42px !important;
+}
+
+.eyebrow {
+    font-size: 12px !important;
+}
+
+
+/* Header */
+
+.brand-title {
+    font-size: 22px !important;
+}
+
+.brand-subtitle {
+    font-size: 11px !important;
+}
+
+.connection-status {
+    font-size: 12px !important;
+}
+
+.settings-button {
+    font-size: 13px !important;
+}
+
+
+/* Info strip */
+
+.info-strip span {
+    font-size: 11px !important;
+}
+
+.info-strip strong {
+    font-size: 14px !important;
+}
+
+
+/* Motor cards */
+
+.motor-header>div>span {
+    font-size: 12px !important;
+}
+
+.motor-header h3 {
+    font-size: 18px !important;
+}
+
+.motor-status {
+    font-size: 12px !important;
+}
+
+.angle-label {
+    font-size: 11px !important;
+}
+
+.range-labels {
+    font-size: 11px !important;
+}
+
+.quick-buttons button {
+    font-size: 12px !important;
+}
+
+
+/* Sensor cards */
+
+.sensor-description {
+    font-size: 12px !important;
+}
+
+.sensor-limits {
+    font-size: 11px !important;
+}
+
+.axis-values span {
+    font-size: 11px !important;
+}
+
+.axis-values strong {
+    font-size: 15px !important;
+}
+
+
+/* Joystick */
+
+.joystick-name {
+    font-size: 13px !important;
+}
+
+.joystick-data span {
+    font-size: 11px !important;
+}
+
+.joystick-data strong {
+    font-size: 15px !important;
+}
+
+
+/* Panel headings */
+
+.panel-header h3 {
+    font-size: 18px !important;
+}
+
+.panel-header>div>span {
+    font-size: 12px !important;
+}
+
+
+/* Diagnostics */
+
+.diagnostic-row>span {
+    font-size: 13px !important;
+}
+
+.diagnostic-row strong {
+    font-size: 12px !important;
+}
+
+
+/* Event log */
+
+.event-row>span {
+    font-size: 12px !important;
+}
+
+.event-type {
+    font-size: 12px !important;
+}
+
+.event-row p {
+    font-size: 14px !important;
+}
+
+
+/* Emergency stop */
+
+.emergency-info>div>span {
+    font-size: 12px !important;
+}
+
+.emergency-info h2 {
+    font-size: 26px !important;
+}
+
+.emergency-info p {
+    font-size: 14px !important;
+}
+
+.estop-button,
+.reset-button {
+    font-size: 14px !important;
+}
+
+
+/* Testing panel */
+
+.testing-panel span {
+    font-size: 12px !important;
+}
+
+.testing-panel p {
+    font-size: 13px !important;
+}
+
+.testing-buttons button {
+    font-size: 12px !important;
+}
+
+
+/* Charts */
+
+.chart-header span {
+    font-size: 12px !important;
+}
+
+.chart-header strong {
+    font-size: 15px !important;
+}
+
+
+/* Footer */
+
+.footer {
+    font-size: 12px !important;
+}
+
+
+/* Maintenance */
+
+.maintenance-section h2 {
+    font-size: 26px !important;
+}
+
+.maintenance-section {
+    font-size: 14px;
+}
+
+
+/* General readable text */
+
+.dashboard p {
+    font-size: 14px;
+}
+
+
+/* Keep tiny technical labels slightly larger */
+
+.dashboard small {
+    font-size: 11px !important;
+}
